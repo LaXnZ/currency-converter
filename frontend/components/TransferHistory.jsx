@@ -1,48 +1,28 @@
-"use client"; 
+"use client";  
 
 import { useState, useEffect } from "react";
 
 const TransferHistoryPage = () => {
   const [transferHistory, setTransferHistory] = useState([]);
 
-   
   useEffect(() => {
-    const fetchTransferHistory = async () => {
-      try {
-        const response = await fetch(
-          `${process.env.NEXT_PUBLIC_API_URL}/history`
-        );
-        if (!response.ok) throw new Error("Failed to fetch transfer history");
-        const history = await response.json();
-        setTransferHistory(history);
-      } catch (error) {
-        console.error("Error fetching transfer history:", error);
-        alert("Failed to load transfer history.");
-      }
-    };
-
-    fetchTransferHistory();
+    const history = JSON.parse(localStorage.getItem("transferHistory")) || [];
+    setTransferHistory(history);
   }, []);
 
-   
   const revokeTransfer = async (id) => {
     try {
-      if (!id) {
-        console.error("Invalid transfer id");
-        alert("Transfer id is missing.");
-        return;
-      }
-
       const response = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL}/revoke/${id}`,
+        `${process.env.NEXT_PUBLIC_API_URL}/history/${id}`,
         {
           method: "DELETE",
         }
       );
       if (!response.ok) throw new Error("Failed to revoke transfer");
 
-      const updatedHistory = transferHistory.filter((transfer) => transfer._id !== id);  
+      const updatedHistory = transferHistory.filter((transfer) => transfer._id !== id);   
       setTransferHistory(updatedHistory);
+      localStorage.setItem("transferHistory", JSON.stringify(updatedHistory));  
     } catch (error) {
       console.error("Error revoking transfer:", error);
       alert("Failed to revoke transfer.");
@@ -58,8 +38,7 @@ const TransferHistoryPage = () => {
       ) : (
         <ul className="space-y-4">
           {transferHistory.map((transfer) => (
-            <li key={transfer._id} className="border-b pb-2 mb-2"> 
-             
+            <li key={transfer._id || transfer.date} className="border-b pb-2 mb-2">
               <div>
                 <strong>
                   {transfer.amount} {transfer.from}
@@ -70,7 +49,7 @@ const TransferHistoryPage = () => {
                 {new Date(transfer.date).toLocaleString()}
               </div>
               <button
-                onClick={() => revokeTransfer(transfer._id)}  
+                onClick={() => revokeTransfer(transfer._id)}   
                 className="text-red-500 hover:underline"
               >
                 Revoke

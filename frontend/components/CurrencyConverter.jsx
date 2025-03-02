@@ -1,10 +1,16 @@
 "use client"; 
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import TransferForm from "./TransferForm";
 
 const CurrencyConverter = () => {
   const [convertedAmount, setConvertedAmount] = useState(null);
+  const [transferHistory, setTransferHistory] = useState([]);
+
+  useEffect(() => {
+    const history = JSON.parse(localStorage.getItem("transferHistory")) || [];
+    setTransferHistory(history);
+  }, []);
 
   const convertCurrency = async (from, to, amount) => {
     try {
@@ -19,7 +25,6 @@ const CurrencyConverter = () => {
       const data = await response.json();
       setConvertedAmount(data.convertedAmount);
 
-      
       const newTransfer = {
         from,
         to,
@@ -28,9 +33,9 @@ const CurrencyConverter = () => {
         date: new Date().toISOString(),
       };
 
-      const history = JSON.parse(localStorage.getItem("transferHistory")) || [];
-      history.push(newTransfer);
-      localStorage.setItem("transferHistory", JSON.stringify(history));
+      const updatedHistory = [...transferHistory, newTransfer];
+      setTransferHistory(updatedHistory);
+      localStorage.setItem("transferHistory", JSON.stringify(updatedHistory));
     } catch (error) {
       console.error("Error converting currency:", error);
       alert("Something went wrong with the conversion. Please try again.");
@@ -46,6 +51,13 @@ const CurrencyConverter = () => {
           <h2 className="font-semibold">Converted Amount: {convertedAmount}</h2>
         </div>
       )}
+      <div className="mt-6 text-center">
+        <a href="/history">
+          <button className="text-blue-500 hover:underline">
+            View Transfer History
+          </button>
+        </a>
+      </div>
     </div>
   );
 };

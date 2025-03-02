@@ -13,8 +13,16 @@ async function getTransferHistory() {
 }
 
 async function revokeTransfer(id) {
-  await Transfer.findByIdAndDelete(id);
-  return { success: true };
-}
+    try {
+      const transfer = await Transfer.findByIdAndDelete(id);
+      if (!transfer) {
+        throw new Error("Transfer not found");
+      }
+      return { success: true, message: "Transfer successfully revoked" };
+    } catch (error) {
+      console.error("Error revoking transfer:", error);
+      throw new Error("Failed to revoke transfer");
+    }
+  }
 
 module.exports = { convertCurrency, getTransferHistory, revokeTransfer };

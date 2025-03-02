@@ -1,6 +1,8 @@
-"use client"; 
+"use client";
 
 import { useState, useEffect } from "react";
+import { Button, Typography, Box } from "@mui/material";
+import Navbar from "./Navbar";
 import TransferForm from "./TransferForm";
 
 const CurrencyConverter = () => {
@@ -14,13 +16,16 @@ const CurrencyConverter = () => {
 
   const convertCurrency = async (from, to, amount) => {
     try {
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/convert`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ from, to, amount }),
-      });
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL}/convert`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ from, to, amount }),
+        }
+      );
 
       const data = await response.json();
       setConvertedAmount(data.convertedAmount);
@@ -43,22 +48,52 @@ const CurrencyConverter = () => {
   };
 
   return (
-    <div className="bg-white shadow-md rounded-lg p-8 max-w-md w-full">
-      <h1 className="text-2xl font-bold mb-4">Currency Converter</h1>
+    <Box
+      sx={{
+        bgcolor: "#f9f9f9",
+        borderRadius: "12px",
+        boxShadow: 3,
+        p: 4,
+        mt: 6,
+      }}
+    >
+      <Typography
+        variant="h4"
+        sx={{ fontWeight: "bold", mb: 3, textAlign: "center", color: "#333" }}
+      >
+        Currency Converter
+      </Typography>
+
       <TransferForm onConvert={convertCurrency} />
+
       {convertedAmount && (
-        <div className="mt-4 text-center">
-          <h2 className="font-semibold">Converted Amount: {convertedAmount}</h2>
-        </div>
+        <Box sx={{ mt: 3, textAlign: "center" }}>
+          <Typography variant="h6" sx={{ fontWeight: "bold", color: "#333" }}>
+            Converted Amount: {convertedAmount}
+          </Typography>
+        </Box>
       )}
-      <div className="mt-6 text-center">
-        <a href="/history">
-          <button className="text-blue-500 hover:underline">
-            View Transfer History
-          </button>
-        </a>
-      </div>
-    </div>
+
+      <Box sx={{ mt: 4, textAlign: "center" }}>
+        <Button
+          variant="outlined"
+          color="neutral"
+          href="/history"
+          sx={{
+            borderRadius: "8px",
+            padding: "8px 24px",
+            fontSize: "16px",
+            color: "#333",
+            borderColor: "#ddd",
+            "&:hover": {
+              borderColor: "#aaa",
+            },
+          }}
+        >
+          View Transfer History
+        </Button>
+      </Box>
+    </Box>
   );
 };
 

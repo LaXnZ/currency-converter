@@ -1,6 +1,7 @@
 "use client";  
 
 import { useState, useEffect } from "react";
+import { Button, List, ListItem, ListItemText, Divider, Typography } from "@mui/material";
 
 const TransferHistoryPage = () => {
   const [transferHistory, setTransferHistory] = useState([]);
@@ -12,6 +13,12 @@ const TransferHistoryPage = () => {
 
   const revokeTransfer = async (id) => {
     try {
+      if (!id) {
+        console.error("Invalid transfer id");
+        alert("Transfer id is missing.");
+        return;
+      }
+
       const response = await fetch(
         `${process.env.NEXT_PUBLIC_API_URL}/history/${id}`,
         {
@@ -20,9 +27,9 @@ const TransferHistoryPage = () => {
       );
       if (!response.ok) throw new Error("Failed to revoke transfer");
 
-      const updatedHistory = transferHistory.filter((transfer) => transfer._id !== id);   
+      const updatedHistory = transferHistory.filter((transfer) => transfer._id !== id);
       setTransferHistory(updatedHistory);
-      localStorage.setItem("transferHistory", JSON.stringify(updatedHistory));  
+      localStorage.setItem("transferHistory", JSON.stringify(updatedHistory));
     } catch (error) {
       console.error("Error revoking transfer:", error);
       alert("Failed to revoke transfer.");
@@ -31,32 +38,33 @@ const TransferHistoryPage = () => {
 
   return (
     <div className="bg-white shadow-md rounded-lg p-8 max-w-md w-full">
-      <h1 className="text-2xl font-bold mb-4">Transfer History</h1>
+      <Typography variant="h5" gutterBottom>
+        Transfer History
+      </Typography>
 
       {transferHistory.length === 0 ? (
-        <p>No transfers made yet.</p>
+        <Typography>No transfers made yet.</Typography>
       ) : (
-        <ul className="space-y-4">
+        <List>
           {transferHistory.map((transfer) => (
-            <li key={transfer._id || transfer.date} className="border-b pb-2 mb-2">
-              <div>
-                <strong>
-                  {transfer.amount} {transfer.from}
-                </strong>{" "}
-                = {transfer.convertedAmount} {transfer.to}
-              </div>
-              <div className="text-sm text-gray-500">
-                {new Date(transfer.date).toLocaleString()}
-              </div>
-              <button
-                onClick={() => revokeTransfer(transfer._id)}   
-                className="text-red-500 hover:underline"
-              >
-                Revoke
-              </button>
-            </li>
+            <div key={transfer._id || transfer.date}>
+              <ListItem>
+                <ListItemText
+                  primary={`${transfer.amount} ${transfer.from} = ${transfer.convertedAmount} ${transfer.to}`}
+                  secondary={new Date(transfer.date).toLocaleString()}
+                />
+                <Button
+                  variant="outlined"
+                  color="secondary"
+                  onClick={() => revokeTransfer(transfer._id)}
+                >
+                  Revoke
+                </Button>
+              </ListItem>
+              <Divider />
+            </div>
           ))}
-        </ul>
+        </List>
       )}
     </div>
   );

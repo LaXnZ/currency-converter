@@ -1,6 +1,7 @@
 "use client"; 
 
 import { useState } from "react";
+import { TextField, Button, MenuItem, Select, InputLabel, FormControl, Box, Typography } from "@mui/material";  
 
 const TransferForm = ({ onConvert }) => {
   const [from, setFrom] = useState("USD");
@@ -13,60 +14,61 @@ const TransferForm = ({ onConvert }) => {
   };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-4">
-      <div>
-        <label htmlFor="from" className="block text-sm font-medium text-gray-700">
-          From Currency
-        </label>
-        <select
-          id="from"
+    <form onSubmit={handleSubmit} style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
+      <FormControl fullWidth>
+        <InputLabel>From Currency</InputLabel>
+        <Select
           value={from}
           onChange={(e) => setFrom(e.target.value)}
-          className="w-full p-2 mt-1 border border-gray-300 rounded"
+          label="From Currency"
         >
-          <option value="USD">USD</option>
-          <option value="LKR">LKR</option>
-          <option value="AUD">AUD</option>
-          <option value="INR">INR</option>
-        </select>
-      </div>
+          <MenuItem value="USD">USD</MenuItem>
+          <MenuItem value="LKR">LKR</MenuItem>
+          <MenuItem value="AUD">AUD</MenuItem>
+          <MenuItem value="INR">INR</MenuItem>
+        </Select>
+      </FormControl>
 
-      <div>
-        <label htmlFor="to" className="block text-sm font-medium text-gray-700">
-          To Currency
-        </label>
-        <select
-          id="to"
+      <FormControl fullWidth>
+        <InputLabel>To Currency</InputLabel>
+        <Select
           value={to}
           onChange={(e) => setTo(e.target.value)}
-          className="w-full p-2 mt-1 border border-gray-300 rounded"
+          label="To Currency"
         >
-          <option value="USD">USD</option>
-          <option value="LKR">LKR</option>
-          <option value="AUD">AUD</option>
-          <option value="INR">INR</option>
-        </select>
-      </div>
+          <MenuItem value="USD">USD</MenuItem>
+          <MenuItem value="LKR">LKR</MenuItem>
+          <MenuItem value="AUD">AUD</MenuItem>
+          <MenuItem value="INR">INR</MenuItem>
+        </Select>
+      </FormControl>
 
-      <div>
-        <label htmlFor="amount" className="block text-sm font-medium text-gray-700">
-          Amount
-        </label>
-        <input
-          type="number"
-          id="amount"
-          value={amount}
-          onChange={(e) => setAmount(e.target.value)}
-          className="w-full p-2 mt-1 border border-gray-300 rounded"
-        />
-      </div>
+      <TextField
+        label="Amount"
+        type="number"
+        value={amount}
+        onChange={(e) => setAmount(e.target.value)}
+        fullWidth
+      />
 
-      <button
+      <Button
+        variant="outlined"
+        color="neutral"
         type="submit"
-        className="w-full bg-blue-500 text-white py-2 rounded"
+        fullWidth
+        sx={{
+          borderRadius: "8px",
+          padding: "12px",
+          fontSize: "16px",
+          borderColor: "#ccc",
+          color: "#333",
+          "&:hover": {
+            borderColor: "#aaa",
+          },
+        }}
       >
         Convert
-      </button>
+      </Button>
     </form>
   );
 };

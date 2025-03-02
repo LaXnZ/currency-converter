@@ -1,11 +1,20 @@
 import CurrencyConverter from "../components/CurrencyConverter";
-import TransferHistory from "../components/TransferHistory";
+import { Box } from "@mui/material";
 
 export default function Home() {
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center bg-gray-100 p-8">
+    <Box
+      sx={{
+        minHeight: "100vh",
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "center",
+        justifyContent: "center",
+        bgcolor: "#f9f9f9",
+        padding: 4,
+      }}
+    >
       <CurrencyConverter />
-    
-    </div>
+    </Box>
   );
 }

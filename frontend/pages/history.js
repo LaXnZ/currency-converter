@@ -1,46 +1,123 @@
+"use client";
+
 import { useState, useEffect } from "react";
+import {
+  AppBar,
+  Toolbar,
+  Button,
+  Typography,
+  List,
+  ListItem,
+  ListItemText,
+  Divider,
+  Container,
+  Box,
+} from "@mui/material";
+import { useRouter } from "next/navigation";
+import Navbar from "@/components/NavBar";
 
 const TransferHistoryPage = () => {
   const [transferHistory, setTransferHistory] = useState([]);
+  const router = useRouter();
 
   useEffect(() => {
     const history = JSON.parse(localStorage.getItem("transferHistory")) || [];
     setTransferHistory(history);
   }, []);
 
-  const revokeTransfer = (index) => {
-    const updatedHistory = transferHistory.filter((_, i) => i !== index);
-    setTransferHistory(updatedHistory);
-    localStorage.setItem("transferHistory", JSON.stringify(updatedHistory));
+  const revokeTransfer = async (id) => {
+    try {
+      if (!id) {
+        console.error("Invalid transfer id");
+        alert("Transfer id is missing.");
+        return;
+      }
+
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL}/history/${id}`,
+        {
+          method: "DELETE",
+        }
+      );
+      if (!response.ok) throw new Error("Failed to revoke transfer");
+
+      const updatedHistory = transferHistory.filter(
+        (transfer) => transfer._id !== id
+      );
+      setTransferHistory(updatedHistory);
+      localStorage.setItem("transferHistory", JSON.stringify(updatedHistory));
+    } catch (error) {
+      console.error("Error revoking transfer:", error);
+      alert("Failed to revoke transfer.");
+    }
   };
 
   return (
-    <div className="bg-white shadow-md rounded-lg p-8 max-w-md w-full">
-      <h1 className="text-2xl font-bold mb-4">Transfer History</h1>
+    <Container>
+     <Navbar />
 
-      {transferHistory.length === 0 ? (
-        <p>No transfers made yet.</p>
-      ) : (
-        <ul className="space-y-4">
-          {transferHistory.map((transfer, index) => (
-            <li key={index} className="border-b pb-2 mb-2">
-              <div>
-                <strong>{transfer.amount} {transfer.from}</strong> = {transfer.convertedAmount} {transfer.to}
+      <Box
+        sx={{
+          bgcolor: "#fff",
+          borderRadius: "12px",
+          boxShadow: 1,
+          p: 4,
+          marginTop: 2,
+        }}
+      >
+        <Typography variant="h5" gutterBottom>
+          Transfer History
+        </Typography>
+
+        {transferHistory.length === 0 ? (
+          <Typography variant="body1" color="textSecondary">
+            No transfers made yet.
+          </Typography>
+        ) : (
+          <List sx={{ paddingBottom: 2 }}>
+            {transferHistory.map((transfer) => (
+              <div key={transfer._id || transfer.date}>
+                <ListItem
+                  sx={{
+                    padding: "12px",
+                    marginBottom: 2,
+                    borderRadius: "8px",
+                    backgroundColor: "#f9f9f9",
+                  }}
+                >
+                  <ListItemText
+                    primary={`${transfer.amount} ${transfer.from} = ${transfer.convertedAmount} ${transfer.to}`}
+                    secondary={new Date(transfer.date).toLocaleString()}
+                    primaryTypographyProps={{
+                      fontSize: "16px",
+                      fontWeight: "bold",
+                    }}
+                    secondaryTypographyProps={{
+                      fontSize: "14px",
+                      color: "#555",
+                    }}
+                  />
+                  <Button
+                    variant="outlined"
+                    color="secondary"
+                    onClick={() => revokeTransfer(transfer._id)}
+                    sx={{
+                      borderRadius: "8px",
+                      textTransform: "none",
+                      padding: "6px 12px",
+                      fontSize: "14px",
+                    }}
+                  >
+                    Revoke
+                  </Button>
+                </ListItem>
+                <Divider sx={{ marginBottom: 2 }} />
               </div>
-              <div className="text-sm text-gray-500">
-                {new Date(transfer.date).toLocaleString()}
-              </div>
-              <button
-                onClick={() => revokeTransfer(index)}
-                className="text-red-500 hover:underline"
-              >
-                Revoke
-              </button>
-            </li>
-          ))}
-        </ul>
-      )}
-    </div>
+            ))}
+          </List>
+        )}
+      </Box>
+    </Container>
   );
 };
 
